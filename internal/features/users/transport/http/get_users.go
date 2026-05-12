@@ -31,7 +31,7 @@ func (h *UsersHTTPHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
 		responseHandler.ErrorResponse(err, "failed to get users")
 	}
 
-	response := GetUsersResponse(UsersDTOFromDomains(userDomains))
+	response := GetUsersResponse(UsersDTOsFromDomains(userDomains))
 
 	responseHandler.JSONResponse(response, http.StatusOK)
 }
