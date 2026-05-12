@@ -18,7 +18,7 @@ func UserDTOFromDomain(user domain.User) UserDTOResponse {
 	}
 }
 
-func UsersDTOFromDomains(users []domain.User) []UserDTOResponse {
+func UsersDTOsFromDomains(users []domain.User) []UserDTOResponse {
 	usersDTO := make([]UserDTOResponse, len(users))
 
 	for i, user := range users {

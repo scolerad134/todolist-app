@@ -1,4 +1,4 @@
-package users_transport_http
+package tasks_transport_http
 
 import (
 	"net/http"
@@ -8,23 +8,19 @@ import (
 	core_http_utils "github.com/scolerad134/todolist-app/internal/core/transport/http/utils"
 )
 
-func (h *UsersHTTPHandler) DeleteUser(rw http.ResponseWriter, r *http.Request) {
+func (h *TasksHTTPHandler) DeleteTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
 	responseHandler := core_http_response.NewHTTPResponseHandler(log, rw)
 
-	userID, err := core_http_utils.GetIntPathValue(r, "id")
+	taskID, err := core_http_utils.GetIntPathValue(r, "id")
 	if err != nil {
-		responseHandler.ErrorResponse(
-			err,
-			"failed to get userID path value",
-		)
-
+		responseHandler.ErrorResponse(err, "failed to get taskID path value")
 		return
 	}
 
-	if err := h.usersService.DeleteUser(ctx, userID); err != nil {
-		responseHandler.ErrorResponse(err, "failed to delete user")
+	if err := h.tasksService.DeleteTask(ctx, taskID); err != nil {
+		responseHandler.ErrorResponse(err, "failed to delete task")
 		return
 	}
 

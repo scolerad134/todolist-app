@@ -35,9 +35,9 @@ func (r *UsersRepository) GetUser(ctx context.Context, id int) (domain.User, err
 			return domain.User{}, fmt.Errorf(
 				"user with id='%d': %w",
 				id, core_errors.ErrNotFound)
-		} else {
-			return domain.User{}, fmt.Errorf("scan user error: %w", err)
 		}
+
+		return domain.User{}, fmt.Errorf("scan user error: %w", err)
 	}
 
 	userDomain := domain.NewUser(
