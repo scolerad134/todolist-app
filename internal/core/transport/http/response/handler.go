@@ -60,7 +60,7 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 
 func (h *HTTPResponseHandler) PanicResponse(p any, msg string) {
 	statusCode := http.StatusInternalServerError
-	err := fmt.Errorf("unexcpected panic: %v", p)
+	err := fmt.Errorf("unexpected panic: %v", p)
 
 	h.log.Error(msg, zap.Error(err))
 
