@@ -39,7 +39,7 @@ func (h *TasksHTTPHandler) Routes() []core_http_server.Route {
 		{
 			Method:  http.MethodGet,
 			Path:    "/tasks/{id}",
-			Handler: h.GetUser,
+			Handler: h.GetTask,
 		},
 		{
 			Method:  http.MethodDelete,
