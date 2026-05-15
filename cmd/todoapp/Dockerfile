@@ -18,5 +18,9 @@ FROM alpine:3.23
 WORKDIR /app
 #Копирование исполняемого файла из stage builder
 COPY --from=builder /app/cmd/todoapp/exe /app
+#Копирование html файла из stage builder
+COPY --from=builder /app/public /app/public
+#Инициализация переменной окружения PROJECT_ROOT
+ENV PROJECT_ROOT=/app
 #Запуск исполняемого файла exe
 CMD ["/app/exe"]
