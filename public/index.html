@@ -1,0 +1,3788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 33l9 9 19-20' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <title>Todoapp</title>
+    <style>
+        /* ==========================================================================
+   Theme tokens
+   ========================================================================== */
+
+        :root {
+            --bg: #f5f6f8;
+            --bg-elevated: #ffffff;
+            --surface: #ffffff;
+            --surface-hover: #f0f1f4;
+            --text: #1a1d23;
+            --text-muted: #6b7280;
+            --border: #e4e6ea;
+            --border-strong: #d1d5db;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-text: #ffffff;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --success: #16a34a;
+            --warning: #d97706;
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --radius-lg: 14px;
+            --transition: 150ms ease;
+            --transition-slow: 320ms ease;
+            --transition-spring: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+            --header-height: 76px;
+            --max-width: 960px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0f1115;
+                --bg-elevated: #181b22;
+                --surface: #1c1f27;
+                --surface-hover: #242832;
+                --text: #e6e8ec;
+                --text-muted: #9aa0aa;
+                --border: #2a2e38;
+                --border-strong: #3a3f4b;
+                --accent: #3b82f6;
+                --accent-hover: #60a5fa;
+                --accent-text: #ffffff;
+                --danger: #ef4444;
+                --danger-hover: #f87171;
+                --success: #22c55e;
+                --warning: #f59e0b;
+                --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+                --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f1115;
+            --bg-elevated: #181b22;
+            --surface: #1c1f27;
+            --surface-hover: #242832;
+            --text: #e6e8ec;
+            --text-muted: #9aa0aa;
+            --border: #2a2e38;
+            --border-strong: #3a3f4b;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --accent-text: #ffffff;
+            --danger: #ef4444;
+            --danger-hover: #f87171;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ==========================================================================
+   Base
+   ========================================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+            Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background var(--transition), color var(--transition);
+            min-height: 100vh;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            padding-bottom: env(safe-area-inset-bottom);
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0 0 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        h1 {
+            font-size: 22px;
+        }
+
+        h2 {
+            font-size: 18px;
+        }
+
+        h3 {
+            font-size: 16px;
+        }
+
+        p {
+            margin: 0 0 8px;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.9em;
+            background: var(--surface-hover);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        #boot-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                    radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 34%),
+                    radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.12), transparent 30%),
+                    var(--bg);
+            transition: opacity 420ms ease, visibility 420ms ease;
+        }
+
+        .boot-splash-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+        }
+
+        .boot-brand-mark {
+            width: 68px;
+            height: 68px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--accent-text);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.28);
+            animation: splash-mark 1400ms var(--transition-spring) infinite alternate;
+        }
+
+        .boot-brand-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+        }
+
+        .boot-brand-subtitle {
+            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .boot-loader {
+            display: inline-flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .boot-loader span {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--accent);
+            animation: splash-dot 900ms ease-in-out infinite;
+        }
+
+        .boot-loader span:nth-child(2) {
+            animation-delay: 120ms;
+        }
+
+        .boot-loader span:nth-child(3) {
+            animation-delay: 240ms;
+        }
+
+        .app-booting #app {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+        }
+
+        .app-ready #app {
+            opacity: 1;
+            transform: none;
+            transition: opacity 520ms ease, transform 520ms var(--transition-spring);
+        }
+
+        .app-ready #boot-splash {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+   Layout
+   ========================================================================== */
+
+        #app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            padding-top: env(safe-area-inset-top);
+            backdrop-filter: saturate(180%) blur(8px);
+            -webkit-backdrop-filter: saturate(180%) blur(8px);
+        }
+
+        .header-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            min-height: var(--header-height);
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--accent-text);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            box-shadow: var(--shadow);
+            flex: 0 0 auto;
+        }
+
+        .brand-copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .brand-title {
+            font-size: 24px;
+            font-weight: 750;
+            line-height: 1;
+            letter-spacing: -0.04em;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .header-controls {
+            min-width: 0;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .header-field,
+        .theme-toggle-wrap {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .header-field-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .user-select {
+            min-width: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .theme-toggle {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 4px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 4px;
+            background: var(--surface);
+            min-width: 230px;
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc((100% - 8px) / 3);
+            height: calc(100% - 8px);
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+            transition: transform var(--transition-spring);
+            z-index: 0;
+        }
+
+        .theme-toggle-btn {
+            appearance: none;
+            background: transparent;
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1;
+            transition: color var(--transition), transform var(--transition-slow);
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--text);
+        }
+
+        .theme-toggle-btn[aria-pressed="true"] {
+            color: var(--accent-text);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.97);
+        }
+
+        .tabs-wrap {
+            position: sticky;
+            top: calc(var(--header-height) + 12px);
+            z-index: 40;
+            padding: 12px 16px 0;
+            pointer-events: none;
+        }
+
+        .tabs {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            pointer-events: auto;
+            justify-items: center;
+
+        }
+
+        .tabs-inner {
+            max-width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+            padding: 6px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+            scrollbar-width: none;
+            backdrop-filter: blur(8px);
+            position: relative;
+            isolation: isolate;
+        }
+
+        .tabs-slider {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: calc((100% - 12px) / 3);
+            height: calc(100% - 12px);
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
+            transition: transform var(--transition-spring);
+            z-index: 0;
+        }
+
+        .tabs-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            background: transparent;
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 18px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition:
+                    background var(--transition),
+                    color var(--transition),
+                    transform 180ms ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:hover {
+            color: var(--text);
+            background: transparent;
+        }
+
+        .tab[aria-selected="true"] {
+            color: var(--accent-text);
+        }
+
+        .main {
+            flex: 1;
+            padding: 28px 16px 40px;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header,
+        .tabs-wrap {
+            will-change: transform;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toolbar h1 {
+            margin: 0;
+        }
+
+        .toolbar .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ==========================================================================
+   Buttons & inputs
+   ========================================================================== */
+
+        .btn {
+            appearance: none;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all var(--transition);
+            min-height: 36px;
+            line-height: 1;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--surface-hover);
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--accent-text);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border-color: var(--border-strong);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+
+        .btn-ghost {
+            border-color: transparent;
+            background: transparent;
+        }
+
+        .btn-ghost:hover:not(:disabled) {
+            background: var(--surface-hover);
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 13px;
+            min-height: 28px;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            padding: 9px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color var(--transition), box-shadow var(--transition);
+            min-height: 38px;
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+        }
+
+        .textarea {
+            min-height: 90px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .field-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .field-row > .field {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 14px;
+        }
+
+        .checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .help {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+   Cards & lists
+   ========================================================================== */
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .card-row + .card-row {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .task-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .task-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 15px 16px;
+            box-shadow: var(--shadow-lg);
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 13px;
+            align-items: center;
+            transition: border-color var(--transition), transform var(--transition);
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            border-color: var(--border-strong);
+            background: var(--surface-hover);
+            transform: translateY(-1px);
+        }
+
+        .task-item.done {
+            background: linear-gradient(180deg, var(--surface) 0%, var(--bg-elevated) 100%);
+        }
+
+        .task-toggle {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            align-self: center;
+            cursor: pointer;
+        }
+
+        .task-check {
+            position: absolute;
+            inset: 0;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .task-check-ui {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: 2px solid var(--border-strong);
+            background: var(--bg-elevated);
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+            transition: transform var(--transition), border-color var(--transition),
+            background var(--transition), color var(--transition), box-shadow var(--transition);
+        }
+
+        .task-toggle:hover .task-check-ui {
+            border-color: var(--success);
+            transform: scale(1.05);
+        }
+
+        .task-check:focus-visible + .task-check-ui {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .task-check:checked + .task-check-ui {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: #ffffff;
+            box-shadow: 0 10px 18px rgba(22, 163, 74, 0.28);
+        }
+
+        .task-body {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-head {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .task-title {
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 1.3;
+            margin: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .task-item.done .task-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            margin-top: 8px;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            color: var(--text-muted);
+            min-width: 0;
+        }
+
+        .task-meta-item.is-complete {
+            color: var(--success);
+        }
+
+        .task-meta-icon {
+            width: 16px;
+            height: 16px;
+            flex: 0 0 auto;
+        }
+
+        .task-meta-text {
+            font-size: 12px;
+            line-height: 1.35;
+            min-width: 0;
+            overflow-wrap: break-word;
+        }
+
+        .task-side-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-icon-btn {
+            width: 62px;
+            height: 62px;
+            min-height: 44px;
+            padding: 0;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+
+        .task-action-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .task-edit-icon-btn {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.14);
+            color: var(--accent);
+        }
+
+        .task-edit-icon-btn:hover:not(:disabled) {
+            background: rgba(37, 99, 235, 0.16);
+            border-color: rgba(37, 99, 235, 0.22);
+            color: var(--accent);
+        }
+
+        .task-delete-icon-btn {
+            background: rgba(220, 38, 38, 0.08);
+            border-color: rgba(220, 38, 38, 0.16);
+            color: var(--danger);
+        }
+
+        .task-delete-icon-btn:hover:not(:disabled) {
+            background: rgba(220, 38, 38, 0.16);
+            border-color: rgba(220, 38, 38, 0.22);
+            color: var(--danger);
+        }
+
+        .user-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+            transition: border-color var(--transition), transform var(--transition);
+        }
+
+        .user-item:hover {
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+        }
+
+        .user-card-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-card-body {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .user-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            color: var(--accent-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+        }
+
+        .user-info {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 17px;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        .user-id-badge {
+            display: inline-flex;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--surface-hover);
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .user-phone {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-muted);
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .user-actions .btn {
+            flex: 1;
+            min-height: 40px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .btn-user-edit {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.18);
+            color: var(--accent);
+        }
+
+        .btn-user-edit:hover:not(:disabled) {
+            background: rgba(37, 99, 235, 0.16);
+            border-color: rgba(37, 99, 235, 0.24);
+        }
+
+        .btn-user-delete {
+            background: rgba(220, 38, 38, 0.08);
+            border-color: rgba(220, 38, 38, 0.16);
+            color: var(--danger);
+        }
+
+        .btn-user-delete:hover:not(:disabled) {
+            background: rgba(220, 38, 38, 0.14);
+            border-color: rgba(220, 38, 38, 0.22);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--surface-hover);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .badge.done {
+            background: rgba(22, 163, 74, 0.15);
+            color: var(--success);
+        }
+
+        .badge.open {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--accent);
+        }
+
+        /* ==========================================================================
+   Statistics
+   ========================================================================== */
+
+        .stats-panel {
+            background:
+                    radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 42%),
+                    var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .stats-user-chip {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .stats-user-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            color: var(--accent-text);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
+            flex: 0 0 auto;
+        }
+
+        .stats-user-copy {
+            min-width: 0;
+        }
+
+        .stats-user-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .stats-user-name {
+            margin-top: 6px;
+            font-size: 20px;
+            font-weight: 750;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+        }
+
+        .stats-panel-note {
+            max-width: 320px;
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .stats-filters {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .stats-preset-toggle {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stats-preset-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .stats-preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+        }
+
+        .stats-preset-btn {
+            appearance: none;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            min-height: 38px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background var(--transition), color var(--transition), border-color var(--transition);
+        }
+
+        .stats-preset-btn:hover {
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .stats-preset-btn[aria-pressed="true"] {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--accent-text);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
+        }
+
+        .stats-range-graph {
+            grid-column: 1 / -1;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-elevated);
+            padding: 14px;
+        }
+
+        .stats-range-boundary-top {
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .stats-range-track {
+            position: relative;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .stats-range-base {
+            width: 100%;
+            height: 4px;
+            border-radius: 999px;
+            background: var(--border);
+        }
+
+        .stats-range-ticks {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 5px;
+            height: 12px;
+            pointer-events: none;
+        }
+
+        .stats-range-tick {
+            position: absolute;
+            top: 0;
+            width: 1px;
+            height: 12px;
+            margin-left: -0.5px;
+            background: var(--border-strong);
+            opacity: 0.9;
+        }
+
+        .stats-range-active {
+            position: absolute;
+            top: 9px;
+            height: 4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(37, 99, 235, 0.25), rgba(37, 99, 235, 0.7));
+        }
+
+        .stats-range-handle {
+            position: absolute;
+            top: 1px;
+            width: 20px;
+            height: 20px;
+            margin-left: -10px;
+            border-radius: 999px;
+            border: 2px solid #ffffff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.26);
+            cursor: grab;
+            z-index: 3;
+            padding: 0;
+            touch-action: none;
+        }
+
+        .stats-range-handle:active {
+            cursor: grabbing;
+        }
+
+        .stats-range-handle:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .stats-range-handle.right {
+            z-index: 4;
+        }
+
+        .stats-range-tooltip {
+            position: absolute;
+            top: -36px;
+            transform: translateX(-50%);
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .stats-boundary {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .stats-boundary.right {
+            text-align: right;
+        }
+
+        .stats-boundary.is-active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+        }
+
+        .stats-boundary-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+        }
+
+        .stats-boundary-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+
+        .stat-card {
+            background:
+                    linear-gradient(180deg, var(--surface) 0%, var(--bg-elevated) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px 18px 20px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .stat-icon-wrap {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--accent);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .stat-icon {
+            width: 17px;
+            height: 17px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 760;
+            line-height: 1.1;
+            word-break: break-word;
+        }
+
+        .stat-suffix {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-left: 4px;
+        }
+
+        .stats-empty {
+            border-radius: 24px;
+        }
+
+        /* ==========================================================================
+   Empty / loading / error states
+   ========================================================================== */
+
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-strong);
+            border-radius: var(--radius);
+            background: var(--bg-elevated);
+        }
+
+        .empty h3 {
+            margin: 0 0 6px;
+            color: var(--text);
+        }
+
+        @keyframes splash-mark {
+            from {
+                transform: translateY(0) scale(1);
+            }
+            to {
+                transform: translateY(-4px) scale(1.04);
+            }
+        }
+
+        @keyframes splash-dot {
+            0%,
+            80%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.45;
+            }
+            40% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-strong);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 800ms linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-block {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            color: var(--text-muted);
+            gap: 10px;
+        }
+
+        .error-block {
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: var(--danger);
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            font-size: 14px;
+        }
+
+        /* ==========================================================================
+   Modal (native dialog)
+   ========================================================================== */
+
+        dialog#modal {
+            border: 0;
+            border-radius: var(--radius-lg);
+            padding: 0;
+            background: var(--bg-elevated);
+            color: var(--text);
+            box-shadow: var(--shadow-lg);
+            width: min(520px, calc(100% - 32px));
+            max-height: calc(100vh - 32px);
+            overflow: auto;
+        }
+
+        dialog#modal::backdrop {
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-footer {
+            padding: 12px 20px 16px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .modal-footer .spacer {
+            flex: 1;
+        }
+
+        /* ==========================================================================
+   Toasts
+   ========================================================================== */
+
+        #toasts {
+            position: fixed;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+            width: min(420px, calc(100% - 32px));
+        }
+
+        .toast {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            font-size: 14px;
+            pointer-events: auto;
+            animation: toast-in 200ms ease;
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+        @media (max-width: 640px) {
+            :root {
+                --header-height: 118px;
+            }
+
+            .header {
+                padding: 0 12px;
+            }
+
+            .header-inner {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+                gap: 12px;
+                padding: 12px 0;
+            }
+
+            .brand-mark {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 12px;
+            }
+
+            .brand-title {
+                font-size: 20px;
+            }
+
+            .header-controls {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .theme-toggle {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .tabs-wrap {
+                top: calc(var(--header-height) + 10px);
+                padding: 10px 12px 0;
+            }
+
+            .tabs {
+                max-width: none;
+            }
+
+            .tabs-inner {
+                margin: 0;
+            }
+
+            .theme-toggle-btn {
+                padding: 8px 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .main {
+                padding: 16px 12px 32px;
+            }
+
+            .task-item,
+            .user-item {
+                padding: 10px 12px;
+            }
+
+            .task-shell {
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 10px;
+            }
+
+            .task-item {
+                grid-template-columns: auto minmax(0, 1fr);
+                gap: 12px;
+                align-items: start;
+            }
+
+            .task-head {
+                align-items: flex-start;
+            }
+
+            .user-actions {
+                flex-direction: column;
+            }
+
+            .task-side-actions {
+                gap: 8px;
+            }
+
+            .task-icon-btn {
+                width: 58px;
+                height: 58px;
+                min-height: 36px;
+            }
+
+            .user-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-panel {
+                padding: 16px;
+                border-radius: 20px;
+            }
+
+            .stats-panel-head {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 14px;
+            }
+
+            .stats-panel-note {
+                max-width: none;
+            }
+
+            .stats-filters {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-range-bounds {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-range-boundary-top {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-boundary.right {
+                text-align: left;
+            }
+
+            .stats-filter-actions {
+                justify-content: stretch;
+            }
+
+            .stats-filter-actions .btn {
+                width: 100%;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            :root {
+                --header-height: 122px;
+            }
+
+            .brand-title {
+                font-size: 18px;
+            }
+
+            .brand-subtitle,
+            .header-field-label {
+                font-size: 10px;
+            }
+
+            .theme-toggle-btn {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+
+            .tab {
+                padding: 9px 14px;
+                font-size: 13px;
+            }
+
+            .task-item {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .task-shell {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .task-side-actions {
+                flex-direction: row;
+                padding-right: 2px;
+            }
+
+            .task-title {
+                font-size: 15px;
+            }
+
+            .task-meta {
+                gap: 6px;
+            }
+
+            .stats-user-avatar {
+                width: 46px;
+                height: 46px;
+                border-radius: 14px;
+                font-size: 16px;
+            }
+
+            .stats-user-name {
+                font-size: 18px;
+            }
+
+            .stats-panel {
+                padding: 14px;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar h1 {
+                font-size: 18px;
+            }
+        }
+
+        @media (hover: none) {
+            .btn {
+                min-height: 40px;
+            }
+            .input,
+            .select,
+            .textarea {
+                min-height: 42px;
+                font-size: 16px;
+            }
+        }
+
+    </style>
+</head>
+<body class="app-booting">
+<div id="boot-splash" aria-hidden="true">
+    <div class="boot-splash-inner">
+        <div class="boot-brand-mark">TD</div>
+        <div class="boot-brand-copy">
+            <div class="boot-brand-title">TodoApp</div>
+            <div class="boot-brand-subtitle">Loading workspace</div>
+        </div>
+        <div class="boot-loader">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<div id="app"></div>
+<dialog id="modal" aria-modal="true"></dialog>
+<div id="toasts" aria-live="polite"></div>
+<script>
+    "use strict";
+
+    /* ==========================================================================
+   Config & state
+   ========================================================================== */
+
+    const API_BASE =
+        localStorage.getItem("API_BASE") ||
+        (location.port === "5050" || location.protocol === "https:"
+            ? "/api/v1"
+            : "http://127.0.0.1:5050/api/v1");
+
+    const VIEWS = ["tasks", "users", "statistics"];
+    const THEMES = ["light", "dark", "system"];
+    const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const state = {
+        view: "tasks",
+        currentUserId: null,
+        users: [],
+        tasks: [],
+        statistics: null,
+        statsForm: { from: "", to: "" },
+        statsGranularity: "week",
+        statsDraggingHandle: null,
+        statsRange: { minDay: 0, maxDay: 6, totalDays: 7 },
+        loading: { users: false, tasks: false, statistics: false },
+        error: { users: null, tasks: null, statistics: null },
+        theme: localStorage.getItem("theme") || "system",
+    };
+
+    const subscribers = new Set();
+    let statisticsRefreshTimer = null;
+    let viewRefreshTimer = null;
+    let previousThemeIndex = null;
+    let previousTabIndex = null;
+    let appShell = null;
+    let lastHeaderKey = "";
+    let lastTabsKey = "";
+
+    function finishBoot() {
+        const body = document.body;
+        if (!body || body.classList.contains("app-ready")) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                body.classList.remove("app-booting");
+                body.classList.add("app-ready");
+            });
+        });
+    }
+
+    function createSegmentedSlider(className, fromIndex, toIndex) {
+        const slider = el("span", { class: className, "aria-hidden": "true" });
+        slider.style.transform = `translateX(${fromIndex * 100}%)`;
+
+        if (fromIndex === toIndex) {
+            return slider;
+        }
+
+        requestAnimationFrame(() => {
+            slider.style.transform = `translateX(${toIndex * 100}%)`;
+        });
+
+        return slider;
+    }
+
+    function setState(patch) {
+        Object.assign(state, patch);
+        subscribers.forEach((fn) => fn());
+    }
+
+    function subscribe(fn) {
+        subscribers.add(fn);
+        return () => subscribers.delete(fn);
+    }
+
+    function getHeaderKey() {
+        return JSON.stringify({
+            theme: state.theme,
+            currentUserId: state.currentUserId,
+            users: state.users.map((u) => [u.id, u.full_name]),
+        });
+    }
+
+    function getTabsKey() {
+        return state.view;
+    }
+
+    function ensureAppShell() {
+        if (appShell) {
+            return appShell;
+        }
+
+        const root = document.getElementById("app");
+        const headerHost = el("div", { class: "app-header-host" });
+        const tabsHost = el("div", { class: "app-tabs-host" });
+        const main = el("main", { class: "main" });
+
+        root.appendChild(headerHost);
+        root.appendChild(tabsHost);
+        root.appendChild(main);
+
+        appShell = { root, headerHost, tabsHost, main };
+        return appShell;
+    }
+
+    /* ==========================================================================
+   API client
+   ========================================================================== */
+
+    class ApiError extends Error {
+        constructor(status, message, payload) {
+            super(message);
+            this.status = status;
+            this.payload = payload;
+        }
+    }
+
+    async function request(method, path, body) {
+        const url = `${API_BASE}${path}`;
+        const opts = {
+            method,
+            headers: { "Content-Type": "application/json" },
+        };
+        if (body !== undefined) opts.body = JSON.stringify(body);
+
+        let res;
+        try {
+            res = await fetch(url, opts);
+        } catch (e) {
+            throw new ApiError(0, `Network error: ${e.message}`);
+        }
+
+        if (res.status === 204) return null;
+
+        const text = await res.text();
+        let data = null;
+        if (text) {
+            try {
+                data = JSON.parse(text);
+            } catch {
+                data = text;
+            }
+        }
+
+        if (!res.ok) {
+            const msg =
+                (data && (data.message || data.error)) ||
+                `HTTP ${res.status} ${res.statusText}`;
+            throw new ApiError(res.status, msg, data);
+        }
+        return data;
+    }
+
+    const api = {
+        users: {
+            list: (params = {}) => request("GET", `/users${qs(params)}`),
+            create: (b) => request("POST", "/users", b),
+            get: (id) => request("GET", `/users/${id}`),
+            patch: (id, b) => request("PATCH", `/users/${id}`, b),
+            delete: (id) => request("DELETE", `/users/${id}`),
+        },
+        tasks: {
+            list: (params = {}) => request("GET", `/tasks${qs(params)}`),
+            create: (b) => request("POST", "/tasks", b),
+            get: (id) => request("GET", `/tasks/${id}`),
+            patch: (id, b) => request("PATCH", `/tasks/${id}`, b),
+            delete: (id) => request("DELETE", `/tasks/${id}`),
+        },
+        statistics: {
+            get: (params = {}) => request("GET", `/statistics${qs(params)}`),
+        },
+    };
+
+    function qs(params) {
+        const filtered = Object.entries(params).filter(
+            ([, v]) => v !== undefined && v !== null && v !== ""
+        );
+        if (!filtered.length) return "";
+        return "?" + new URLSearchParams(filtered).toString();
+    }
+
+    /* ==========================================================================
+   Theme
+   ========================================================================== */
+
+    function getResolvedTheme(theme) {
+        return theme === "system" ? (systemThemeQuery.matches ? "dark" : "light") : theme;
+    }
+
+    function applyTheme(theme) {
+        const root = document.documentElement;
+        const resolvedTheme = getResolvedTheme(theme);
+
+        if (theme === "system") {
+            root.removeAttribute("data-theme");
+        } else {
+            root.setAttribute("data-theme", resolvedTheme);
+        }
+
+        root.style.colorScheme = resolvedTheme;
+
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute(
+                "content",
+                resolvedTheme === "dark" ? "#0f1115" : "#ffffff"
+            );
+        }
+    }
+
+    function setTheme(theme) {
+        if (!THEMES.includes(theme)) theme = "system";
+        localStorage.setItem("theme", theme);
+        setState({ theme });
+        applyTheme(theme);
+    }
+
+    function initSystemThemeSync() {
+        const handleSystemThemeChange = () => {
+            if (state.theme === "system") {
+                applyTheme("system");
+            }
+        };
+
+        if (typeof systemThemeQuery.addEventListener === "function") {
+            systemThemeQuery.addEventListener("change", handleSystemThemeChange);
+        } else if (typeof systemThemeQuery.addListener === "function") {
+            systemThemeQuery.addListener(handleSystemThemeChange);
+        }
+    }
+
+    /* ==========================================================================
+   Router (hash-based)
+   ========================================================================== */
+
+    function parseHash() {
+        const raw = (location.hash || "").replace(/^#\/?/, "");
+        const view = raw.split("/")[0] || "tasks";
+        return VIEWS.includes(view) ? view : "tasks";
+    }
+
+    function navigate(view) {
+        if (!VIEWS.includes(view)) view = "tasks";
+        if (location.hash !== `#/${view}`) {
+            location.hash = `#/${view}`;
+            return;
+        }
+        setState({ view });
+    }
+
+    function initRouter() {
+        window.addEventListener("hashchange", () =>
+            setState({ view: parseHash() })
+        );
+        state.view = parseHash();
+    }
+
+    /* ==========================================================================
+   Persistent current user
+   ========================================================================== */
+
+    function loadCurrentUser() {
+        const v = localStorage.getItem("currentUserId");
+        state.currentUserId = v ? parseInt(v, 10) : null;
+    }
+
+    function setCurrentUser(id) {
+        if (id === null || id === "") {
+            localStorage.removeItem("currentUserId");
+            setState({ currentUserId: null });
+        } else {
+            const num = parseInt(id, 10);
+            localStorage.setItem("currentUserId", String(num));
+            setState({ currentUserId: num });
+        }
+        refreshTasks();
+    }
+
+    /* ==========================================================================
+   Data loaders
+   ========================================================================== */
+
+    async function refreshUsers() {
+        setState({ loading: { ...state.loading, users: true }, error: { ...state.error, users: null } });
+        try {
+            const users = (await api.users.list()) || [];
+            users.sort((a, b) => a.full_name.localeCompare(b.full_name));
+            setState({ users });
+            if (state.currentUserId && !users.find((u) => u.id === state.currentUserId)) {
+                setCurrentUser(null);
+            }
+        } catch (e) {
+            setState({ error: { ...state.error, users: e.message } });
+        } finally {
+            setState({ loading: { ...state.loading, users: false } });
+        }
+    }
+
+    async function refreshTasks() {
+        setState({ loading: { ...state.loading, tasks: true }, error: { ...state.error, tasks: null } });
+        try {
+            const params = {};
+            if (state.currentUserId) params.user_id = state.currentUserId;
+            const tasks = (await api.tasks.list(params)) || [];
+            tasks.sort((a, b) => {
+                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+            setState({ tasks });
+        } catch (e) {
+            setState({ error: { ...state.error, tasks: e.message } });
+        } finally {
+            setState({ loading: { ...state.loading, tasks: false } });
+        }
+    }
+
+    async function refreshStatistics() {
+        if (!state.statsForm.from || !state.statsForm.to) {
+            setStatsGranularity(state.statsGranularity);
+            return;
+        }
+
+        setState({
+            loading: { ...state.loading, statistics: true },
+            error: { ...state.error, statistics: null },
+        });
+        try {
+            const params = {};
+            if (state.currentUserId) params.user_id = state.currentUserId;
+            if (state.statsForm.from) params.from = state.statsForm.from;
+            if (state.statsForm.to) params.to = toExclusiveDateParam(state.statsForm.to);
+            const statistics = await api.statistics.get(params);
+            setState({ statistics });
+        } catch (e) {
+            setState({ error: { ...state.error, statistics: e.message }, statistics: null });
+        } finally {
+            setState({ loading: { ...state.loading, statistics: false } });
+        }
+    }
+
+    function toExclusiveDateParam(dateStr) {
+        const date = parseDateInputValue(dateStr);
+        if (!date) {
+            return dateStr;
+        }
+
+        date.setDate(date.getDate() + 1);
+        return formatDateInputValue(date);
+    }
+
+    function parseDateInputValue(value) {
+        if (!value) return null;
+        const parts = value.split("-").map(Number);
+        if (parts.length !== 3 || parts.some((v) => Number.isNaN(v))) return null;
+        const [year, month, day] = parts;
+        const date = new Date(year, month - 1, day);
+        if (
+            Number.isNaN(date.getTime()) ||
+            date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day
+        ) {
+            return null;
+        }
+        return date;
+    }
+
+    function formatDateInputValue(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function formatDateLabel(value) {
+        const date = parseDateInputValue(value);
+        if (!date) return "Not set";
+        return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    }
+
+    function addDays(date, days) {
+        const next = new Date(date);
+        next.setDate(next.getDate() + days);
+        return next;
+    }
+
+    function getGranularityDaysByName(granularity) {
+        return {
+            week: 7,
+            month: 30,
+            year: 365,
+        }[granularity] || 7;
+    }
+
+    function getStatsRangeMaxOffset(totalDays = state.statsRange.totalDays) {
+        return Math.max(totalDays - 1, 0);
+    }
+
+    function getStatsRangeBounds(totalDays = state.statsRange.totalDays) {
+        const today = new Date();
+        const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const start = addDays(end, -(Math.max(totalDays, 1) - 1));
+        return { start, end };
+    }
+
+    function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+    }
+
+    function syncStatsRangeFromForm() {
+        const totalDays = state.statsRange.totalDays;
+        const maxOffset = getStatsRangeMaxOffset(totalDays);
+        const { start } = getStatsRangeBounds(totalDays);
+        const fromDate = parseDateInputValue(state.statsForm.from);
+        const toDate = parseDateInputValue(state.statsForm.to);
+
+        if (!fromDate || !toDate) return;
+
+        const minDay = clamp(
+            Math.floor((fromDate - start) / 86400000),
+            0,
+            maxOffset
+        );
+        const maxDay = clamp(
+            Math.floor((toDate - start) / 86400000),
+            0,
+            maxOffset
+        );
+
+        setState({
+            statsRange: {
+                ...state.statsRange,
+                minDay: Math.min(minDay, maxDay),
+                maxDay: Math.max(minDay, maxDay),
+            },
+        });
+    }
+
+    function updateStatsRangeRange(nextMinDay, nextMaxDay, options = {}) {
+        const totalDays = state.statsRange.totalDays;
+        const maxOffset = getStatsRangeMaxOffset(totalDays);
+        const minGap = 1;
+        const minDay = clamp(nextMinDay, 0, maxOffset);
+        const maxDay = clamp(nextMaxDay, 0, maxOffset);
+        let safeMinDay = Math.min(minDay, maxDay);
+        let safeMaxDay = Math.max(minDay, maxDay);
+
+        if (safeMaxDay-safeMinDay < minGap) {
+            if (options.draggingHandle === "left") {
+                safeMinDay = clamp(safeMaxDay - minGap, 0, maxOffset-minGap);
+                safeMaxDay = clamp(safeMinDay + minGap, minGap, maxOffset);
+            } else {
+                safeMaxDay = clamp(safeMinDay + minGap, minGap, maxOffset);
+                safeMinDay = clamp(safeMaxDay - minGap, 0, maxOffset-minGap);
+            }
+        }
+        const { start } = getStatsRangeBounds(totalDays);
+        const fromDate = addDays(start, safeMinDay);
+        const toDate = addDays(start, safeMaxDay);
+
+        setState({
+            statsDraggingHandle: options.draggingHandle ?? state.statsDraggingHandle,
+            statsRange: { ...state.statsRange, minDay: safeMinDay, maxDay: safeMaxDay },
+            statsForm: {
+                from: formatDateInputValue(fromDate),
+                to: formatDateInputValue(toDate),
+            },
+        });
+        scheduleStatisticsRefresh();
+    }
+
+    function updateStatsRangeMin(nextMinDay) {
+        const minDay = clamp(nextMinDay, 0, state.statsRange.maxDay - 1);
+        updateStatsRangeRange(minDay, state.statsRange.maxDay);
+    }
+
+    function updateStatsRangeMax(nextMaxDay) {
+        const maxDay = clamp(
+            nextMaxDay,
+            state.statsRange.minDay + 1,
+            getStatsRangeMaxOffset()
+        );
+        updateStatsRangeRange(state.statsRange.minDay, maxDay);
+    }
+
+    function getStatsDayByClientX(clientX) {
+        const track = document.querySelector(".stats-range-track");
+        if (!track) return null;
+
+        const rect = track.getBoundingClientRect();
+        if (rect.width <= 0) return null;
+
+        const relativeX = clamp(clientX - rect.left, 0, rect.width);
+        const ratio = relativeX / rect.width;
+        return Math.round(ratio * getStatsRangeMaxOffset());
+    }
+
+    function getStatsTickPercents() {
+        const maxOffset = getStatsRangeMaxOffset();
+        if (maxOffset <= 0) {
+            return [0];
+        }
+
+        if (state.statsGranularity === "week") {
+            return Array.from({ length: maxOffset + 1 }, (_, i) => (i / maxOffset) * 100);
+        }
+
+        if (state.statsGranularity === "month") {
+            const step = 5;
+            const ticks = [];
+            for (let day = 0; day <= maxOffset; day += step) {
+                ticks.push((day / maxOffset) * 100);
+            }
+            if (ticks[ticks.length - 1] !== 100) ticks.push(100);
+            return ticks;
+        }
+
+        const ticks = [];
+        const step = Math.max(Math.round(maxOffset / 12), 1);
+        for (let day = 0; day <= maxOffset; day += step) {
+            ticks.push((day / maxOffset) * 100);
+        }
+        if (ticks[ticks.length - 1] !== 100) ticks.push(100);
+        return ticks;
+    }
+
+    function setStatsGranularity(granularity) {
+        const totalDays = getGranularityDaysByName(granularity);
+        const maxOffset = getStatsRangeMaxOffset(totalDays);
+        const { start, end } = getStatsRangeBounds(totalDays);
+
+        setState({
+            statsGranularity: granularity,
+            statsDraggingHandle: null,
+            statsRange: {
+                ...state.statsRange,
+                totalDays,
+                minDay: 0,
+                maxDay: maxOffset,
+            },
+            statsForm: {
+                from: formatDateInputValue(start),
+                to: formatDateInputValue(end),
+            },
+        });
+        scheduleStatisticsRefresh();
+    }
+
+    function beginStatsHandleDrag(side, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const pointerId = event.pointerId;
+
+        const updateByClientX = (clientX) => {
+            const day = getStatsDayByClientX(clientX);
+            if (day == null) return;
+
+            if (side === "left") {
+                updateStatsRangeRange(day, state.statsRange.maxDay, {
+                    draggingHandle: "left",
+                });
+            } else {
+                updateStatsRangeRange(state.statsRange.minDay, day, {
+                    draggingHandle: "right",
+                });
+            }
+        };
+
+        updateByClientX(event.clientX);
+
+        const move = (moveEvent) => {
+            if (moveEvent.pointerId !== pointerId) return;
+            moveEvent.preventDefault();
+            updateByClientX(moveEvent.clientX);
+        };
+
+        const up = (upEvent) => {
+            if (upEvent.pointerId !== pointerId) return;
+            window.removeEventListener("pointermove", move);
+            window.removeEventListener("pointerup", up);
+            window.removeEventListener("pointercancel", up);
+            setState({ statsDraggingHandle: null });
+        };
+
+        window.addEventListener("pointermove", move, { passive: false });
+        window.addEventListener("pointerup", up);
+        window.addEventListener("pointercancel", up);
+    }
+
+    function handleStatsTrackPointerDown(event) {
+        const day = getStatsDayByClientX(event.clientX);
+        if (day == null) return;
+
+        const leftDistance = Math.abs(day - state.statsRange.minDay);
+        const rightDistance = Math.abs(day - state.statsRange.maxDay);
+
+        if (leftDistance <= rightDistance) {
+            updateStatsRangeMin(day);
+            beginStatsHandleDrag("left", event);
+        } else {
+            updateStatsRangeMax(day);
+            beginStatsHandleDrag("right", event);
+        }
+    }
+
+    function scheduleStatisticsRefresh() {
+        if (statisticsRefreshTimer) {
+            clearTimeout(statisticsRefreshTimer);
+        }
+
+        statisticsRefreshTimer = setTimeout(() => {
+            statisticsRefreshTimer = null;
+            if (state.view === "statistics") {
+                refreshStatistics();
+            }
+        }, 180);
+    }
+
+    function scheduleViewRefresh(fn) {
+        if (viewRefreshTimer) {
+            clearTimeout(viewRefreshTimer);
+        }
+
+        viewRefreshTimer = setTimeout(() => {
+            viewRefreshTimer = null;
+            fn();
+        }, 360);
+    }
+
+    /* ==========================================================================
+   UI helpers
+   ========================================================================== */
+
+    function el(tag, attrs = {}, children = []) {
+        const node = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) {
+            if (v === false || v === null || v === undefined) continue;
+            if (k === "class") node.className = v;
+            else if (k === "dataset") Object.assign(node.dataset, v);
+            else if (k.startsWith("on") && typeof v === "function") {
+                node.addEventListener(k.slice(2).toLowerCase(), v);
+            } else if (k in node && typeof node[k] !== "object") {
+                node[k] = v;
+            } else {
+                node.setAttribute(k, v === true ? "" : v);
+            }
+        }
+        appendChildren(node, children);
+        return node;
+    }
+
+    function appendChildren(node, children) {
+        if (children == null || children === false) return;
+        if (Array.isArray(children)) {
+            for (const c of children) appendChildren(node, c);
+            return;
+        }
+        if (children instanceof Node) node.appendChild(children);
+        else node.appendChild(document.createTextNode(String(children)));
+    }
+
+    function clear(node) {
+        while (node.firstChild) node.removeChild(node.firstChild);
+    }
+
+    function escapeHtml(s) {
+        return String(s ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+    }
+
+    function formatDate(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        if (isNaN(d)) return iso;
+        return d.toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
+    function formatDurationHuman(value) {
+        if (!value || typeof value !== "string") return "—";
+
+        const normalized = value.trim();
+        if (!normalized) return "—";
+
+        const hoursMatch = normalized.match(/(\d+)h/);
+        const millisMatch = normalized.match(/(\d+)ms/);
+        const minutesMatch = normalized.match(/(\d+)m(?!s)/);
+        const secondsMatch = normalized.match(/(\d+)s(?![a-z])/i);
+
+        const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+        const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+        const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+        const millis = millisMatch ? parseInt(millisMatch[1], 10) : 0;
+
+        if (hours > 0) {
+            return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+        }
+        if (minutes > 0) {
+            return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
+        }
+        if (seconds > 0) {
+            return `${seconds}s`;
+        }
+        if (millis > 0) {
+            return `${millis}ms`;
+        }
+        return normalized;
+    }
+
+    function userById(id) {
+        return state.users.find((u) => u.id === id);
+    }
+
+    function userInitials(name) {
+        if (!name) return "?";
+        return name
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((p) => p[0])
+            .join("")
+            .toUpperCase();
+    }
+
+    function svgIcon(name, className = "icon") {
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("aria-hidden", "true");
+        svg.setAttribute("focusable", "false");
+        svg.setAttribute("class", className);
+        svg.setAttribute("fill", "none");
+        svg.setAttribute("stroke", "currentColor");
+        svg.setAttribute("stroke-width", "1.9");
+        svg.setAttribute("stroke-linecap", "round");
+        svg.setAttribute("stroke-linejoin", "round");
+
+        const linesByIcon = {
+            user: [
+                ["circle", { cx: "12", cy: "8", r: "3.2" }],
+                ["path", { d: "M5.5 19a6.5 6.5 0 0 1 13 0" }],
+            ],
+            calendar: [
+                ["path", { d: "M7 3v3" }],
+                ["path", { d: "M17 3v3" }],
+                ["rect", { x: "4", y: "5", width: "16", height: "15", rx: "3" }],
+                ["path", { d: "M4 10h16" }],
+            ],
+            check: [
+                ["circle", { cx: "12", cy: "12", r: "8.5" }],
+                ["path", { d: "m8.8 12 2.1 2.2 4.5-4.8" }],
+            ],
+            pencil: [
+                ["path", { d: "M4 20.2 8.6 19l8.6-8.6a2.2 2.2 0 0 0-3.1-3.1L5.5 15.9 4 20.2Z" }],
+                ["path", { d: "m12.8 6.6 3.1 3.1" }],
+            ],
+            trash: [
+                ["path", { d: "M4.5 7h15" }],
+                ["path", { d: "M9.5 3.8h5l.7 1.7h3.1" }],
+                ["path", { d: "M7.2 7l.8 11a2 2 0 0 0 2 1.8h4a2 2 0 0 0 2-1.8l.8-11" }],
+                ["path", { d: "M10 10.5v5.5" }],
+                ["path", { d: "M14 10.5v5.5" }],
+            ],
+        };
+
+        for (const [tag, attrs] of linesByIcon[name] || []) {
+            const node = document.createElementNS(svgNS, tag);
+            for (const [key, value] of Object.entries(attrs)) {
+                node.setAttribute(key, value);
+            }
+            svg.appendChild(node);
+        }
+
+        return svg;
+    }
+
+    /* ==========================================================================
+   Toasts
+   ========================================================================== */
+
+    function toast(message, type = "info") {
+        const container = document.getElementById("toasts");
+        const node = el("div", { class: `toast ${type}` }, message);
+        container.appendChild(node);
+        setTimeout(() => {
+            node.style.opacity = "0";
+            node.style.transition = "opacity 200ms";
+            setTimeout(() => node.remove(), 220);
+        }, 3200);
+    }
+
+    /* ==========================================================================
+   Modal
+   ========================================================================== */
+
+    const modalEl = () => document.getElementById("modal");
+
+    function openModal(content) {
+        const m = modalEl();
+        clear(m);
+        appendChildren(m, content);
+        if (typeof m.showModal === "function") m.showModal();
+        else m.setAttribute("open", "");
+    }
+
+    function closeModal() {
+        const m = modalEl();
+        if (typeof m.close === "function") m.close();
+        else m.removeAttribute("open");
+        clear(m);
+    }
+
+    modalEl().addEventListener("click", (e) => {
+        if (e.target === modalEl()) closeModal();
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modalEl().open) closeModal();
+    });
+
+    /* ==========================================================================
+   Header & tabs
+   ========================================================================== */
+
+    function renderHeader() {
+        const themeIndex = {
+            light: 0,
+            dark: 1,
+            system: 2,
+        }[state.theme] ?? 2;
+        const themeFromIndex = previousThemeIndex ?? themeIndex;
+        previousThemeIndex = themeIndex;
+
+        const themeBtn = (label, value) =>
+            el(
+                "button",
+                {
+                    type: "button",
+                    class: "theme-toggle-btn",
+                    "aria-pressed": state.theme === value ? "true" : "false",
+                    onclick: () => setTheme(value),
+                },
+                label
+            );
+
+        return el("header", { class: "header" }, [
+            el("div", { class: "header-inner" }, [
+                el("div", { class: "brand" }, [
+                    el("span", { class: "brand-mark", "aria-hidden": "true" }, "TD"),
+                    el("span", { class: "brand-copy" }, [
+                        el("span", { class: "brand-title" }, "TodoApp"),
+                        el("span", { class: "brand-subtitle" }, "workspace"),
+                    ]),
+                ]),
+                el("div", { class: "header-controls" }, [
+                    el("div", { class: "header-field" }, [
+                        el("span", { class: "header-field-label" }, "User"),
+                        el(
+                            "select",
+                            {
+                                class: "select user-select",
+                                "aria-label": "Current user",
+                                onchange: (e) => setCurrentUser(e.target.value),
+                            },
+                            [
+                                el(
+                                    "option",
+                                    {
+                                        value: "",
+                                        selected: state.currentUserId == null,
+                                    },
+                                    "All users"
+                                ),
+                                ...state.users.map((u) =>
+                                    el(
+                                        "option",
+                                        {
+                                            value: u.id,
+                                            selected: state.currentUserId === u.id,
+                                        },
+                                        `${u.full_name}`
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]),
+                    el("div", { class: "theme-toggle-wrap" }, [
+                        el("span", { class: "header-field-label" }, "Theme"),
+                        el("div", {
+                            class: "theme-toggle",
+                            role: "group",
+                            "aria-label": "Theme",
+                        }, [
+                            createSegmentedSlider(
+                                "theme-toggle-slider",
+                                themeFromIndex,
+                                themeIndex
+                            ),
+                            themeBtn("Light", "light"),
+                            themeBtn("Dark", "dark"),
+                            themeBtn("Auto", "system"),
+                        ]),
+                    ]),
+                ]),
+            ]),
+        ]);
+    }
+
+    function renderTabs() {
+        const tabIndex = {
+            tasks: 0,
+            users: 1,
+            statistics: 2,
+        }[state.view] ?? 0;
+        const tabFromIndex = previousTabIndex ?? tabIndex;
+        previousTabIndex = tabIndex;
+
+        const tab = (id, label) =>
+            el(
+                "button",
+                {
+                    class: "tab",
+                    role: "tab",
+                    "aria-selected": state.view === id ? "true" : "false",
+                    onclick: () => navigate(id),
+                },
+                label
+            );
+
+        return el("div", { class: "tabs-wrap" }, [
+            el("nav", { class: "tabs", "aria-label": "Sections" }, [
+                el("div", {
+                    class: "tabs-inner",
+                    role: "tablist",
+                }, [
+                    createSegmentedSlider("tabs-slider", tabFromIndex, tabIndex),
+                    tab("tasks", "Tasks"),
+                    tab("users", "Users"),
+                    tab("statistics", "Statistics"),
+                ]),
+            ]),
+        ]);
+    }
+
+    /* ==========================================================================
+   Tasks view
+   ========================================================================== */
+
+    function renderTasksView() {
+        const container = el("section", { class: "container" });
+
+        const title = state.currentUserId
+            ? `Tasks — ${userById(state.currentUserId)?.full_name ?? "user"}`
+            : "Tasks";
+
+        container.appendChild(
+            el("div", { class: "toolbar" }, [
+                el("h1", {}, title),
+                el("div", { class: "actions" }, [
+                    el(
+                        "button",
+                        {
+                            class: "btn",
+                            onclick: () => refreshTasks(),
+                        },
+                        "Refresh"
+                    ),
+                    el(
+                        "button",
+                        {
+                            class: "btn btn-primary",
+                            onclick: () => openCreateTaskModal(),
+                        },
+                        "+ New task"
+                    ),
+                ]),
+            ])
+        );
+
+        if (state.error.tasks) {
+            container.appendChild(el("div", { class: "error-block" }, state.error.tasks));
+        }
+
+        if (state.loading.tasks && state.tasks.length === 0) {
+            container.appendChild(
+                el("div", { class: "loading-block" }, [el("div", { class: "spinner" }), "Loading…"])
+            );
+            return container;
+        }
+
+        if (state.tasks.length === 0) {
+            container.appendChild(
+                el("div", { class: "empty" }, [
+                    el("h3", {}, "No tasks yet"),
+                    el("p", {}, state.currentUserId ? "Create the first task for this user." : "Create a task to get started."),
+                ])
+            );
+            return container;
+        }
+
+        const list = el("div", { class: "list" });
+        state.tasks.forEach((task) => list.appendChild(renderTaskItem(task)));
+        container.appendChild(list);
+
+        return container;
+    }
+
+    function renderTaskItem(task) {
+        const author = userById(task.author_user_id);
+        const metaItem = (iconName, text, className = "") =>
+            el("div", { class: `task-meta-item ${className}`.trim() }, [
+                svgIcon(iconName, "task-meta-icon"),
+                el("span", { class: "task-meta-text" }, text),
+            ]);
+
+        return el("div", { class: `task-shell ${task.completed ? "done" : ""}` }, [
+            el("article", {
+                class: `task-item ${task.completed ? "done" : ""}`,
+                role: "button",
+                tabindex: 0,
+                onclick: () => toggleTaskComplete(task, !task.completed),
+                onkeydown: (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        toggleTaskComplete(task, !task.completed);
+                    }
+                },
+            }, [
+                el("label", { class: "task-toggle" }, [
+                    el("input", {
+                        type: "checkbox",
+                        class: "task-check",
+                        checked: task.completed,
+                        "aria-label": "Toggle completion",
+                        onclick: (e) => e.stopPropagation(),
+                        onchange: (e) => toggleTaskComplete(task, e.target.checked),
+                    }),
+                    el("span", { class: "task-check-ui", "aria-hidden": "true" }, "✓"),
+                ]),
+                el("div", { class: "task-body" }, [
+                    el("div", { class: "task-head" }, [el("p", { class: "task-title" }, task.title)]),
+                    task.description
+                        ? el("div", { class: "task-desc" }, task.description)
+                        : null,
+                    el("div", { class: "task-meta" }, [
+                        metaItem("user", author ? author.full_name : "#" + task.author_user_id),
+                        metaItem("calendar", formatDate(task.created_at)),
+                        task.completed_at
+                            ? metaItem("check", formatDate(task.completed_at), "is-complete")
+                            : null,
+                    ]),
+                ]),
+            ]),
+            el("div", { class: "task-side-actions" }, [
+                el(
+                    "button",
+                    {
+                        class: "btn btn-sm task-icon-btn task-edit-icon-btn",
+                        "aria-label": "Edit task",
+                        title: "Edit task",
+                        onclick: (e) => {
+                            e.stopPropagation();
+                            openEditTaskModal(task);
+                        },
+                    },
+                    svgIcon("pencil", "task-action-icon")
+                ),
+                el(
+                    "button",
+                    {
+                        class: "btn btn-sm task-icon-btn task-delete-icon-btn",
+                        "aria-label": "Delete task",
+                        title: "Delete task",
+                        onclick: (e) => {
+                            e.stopPropagation();
+                            confirmDeleteTask(task);
+                        },
+                    },
+                    svgIcon("trash", "task-action-icon")
+                ),
+            ]),
+        ]);
+    }
+
+    async function toggleTaskComplete(task, completed) {
+        try {
+            await api.tasks.patch(task.id, { completed });
+            toast(completed ? "Task completed" : "Task reopened", "success");
+            await refreshTasks();
+        } catch (e) {
+            toast(e.message, "error");
+        }
+    }
+
+    function openCreateTaskModal() {
+        if (state.users.length === 0) {
+            toast("Create a user first", "error");
+            return;
+        }
+
+        let titleVal = "";
+        let descVal = "";
+        let authorId = state.currentUserId ?? state.users[0].id;
+
+        const titleInput = el("input", {
+            class: "input",
+            type: "text",
+            maxLength: 100,
+            required: true,
+            oninput: (e) => (titleVal = e.target.value),
+        });
+        const descInput = el("textarea", {
+            class: "textarea",
+            maxLength: 1000,
+            oninput: (e) => (descVal = e.target.value),
+        });
+        const authorSelect = el(
+            "select",
+            {
+                class: "select",
+                onchange: (e) => (authorId = parseInt(e.target.value, 10)),
+            },
+            state.users.map((u) =>
+                el("option", { value: u.id, selected: u.id === authorId }, u.full_name)
+            )
+        );
+
+        openModal([
+            el("div", { class: "modal-header" }, [
+                el("h2", {}, "New task"),
+                el("button", { class: "btn btn-ghost btn-sm", onclick: closeModal, "aria-label": "Close" }, "✕"),
+            ]),
+            el("form", {
+                class: "modal-body",
+                onsubmit: async (e) => {
+                    e.preventDefault();
+                    if (!titleVal.trim()) {
+                        toast("Title is required", "error");
+                        return;
+                    }
+                    try {
+                        const body = {
+                            title: titleVal.trim(),
+                            author_user_id: authorId,
+                        };
+                        const desc = descVal.trim();
+                        if (desc) body.description = desc;
+                        await api.tasks.create(body);
+                        toast("Task created", "success");
+                        closeModal();
+                        await refreshTasks();
+                    } catch (err) {
+                        toast(err.message, "error");
+                    }
+                },
+            }, [
+                el("div", { class: "field" }, [
+                    el("label", {}, "Title"),
+                    titleInput,
+                    el("span", { class: "help" }, "1–100 characters"),
+                ]),
+                el("div", { class: "field" }, [
+                    el("label", {}, "Description (optional)"),
+                    descInput,
+                    el("span", { class: "help" }, "Up to 1000 characters"),
+                ]),
+                el("div", { class: "field" }, [
+                    el("label", {}, "Author"),
+                    authorSelect,
+                ]),
+                el("div", { class: "modal-footer" }, [
+                    el("button", { type: "button", class: "btn", onclick: closeModal }, "Cancel"),
+                    el("button", { type: "submit", class: "btn btn-primary" }, "Create"),
+                ]),
+            ]),
+        ]);
+
+        setTimeout(() => titleInput.focus(), 50);
+    }
+
+    function openEditTaskModal(task) {
+        let titleVal = task.title;
+        let descVal = task.description ?? "";
+        let descClear = false;
+        let completed = task.completed;
+
+        const titleInput = el("input", {
+            class: "input",
+            type: "text",
+            value: titleVal,
+            maxLength: 100,
+            required: true,
+            oninput: (e) => (titleVal = e.target.value),
+        });
+        const descInput = el("textarea", {
+            class: "textarea",
+            value: descVal,
+            maxLength: 1000,
+            oninput: (e) => {
+                descVal = e.target.value;
+                descClear = false;
+                clearCheckbox.checked = false;
+            },
+        });
+        const clearCheckbox = el("input", {
+            type: "checkbox",
+            onchange: (e) => {
+                descClear = e.target.checked;
+                if (descClear) {
+                    descInput.value = "";
+                    descInput.disabled = true;
+                } else {
+                    descInput.disabled = false;
+                }
+            },
+        });
+        const completedCheckbox = el("input", {
+            type: "checkbox",
+            checked: completed,
+            onchange: (e) => (completed = e.target.checked),
+        });
+
+        openModal([
+            el("div", { class: "modal-header" }, [
+                el("h2", {}, "Edit task"),
+                el("button", { class: "btn btn-ghost btn-sm", onclick: closeModal, "aria-label": "Close" }, "✕"),
+            ]),
+            el("form", {
+                class: "modal-body",
+                onsubmit: async (e) => {
+                    e.preventDefault();
+                    const patch = {};
+                    const newTitle = titleVal.trim();
+                    if (!newTitle) {
+                        toast("Title is required", "error");
+                        return;
+                    }
+                    if (newTitle !== task.title) patch.title = newTitle;
+                    if (descClear) {
+                        patch.description = null;
+                    } else {
+                        const newDesc = descVal.trim();
+                        const oldDesc = task.description ?? "";
+                        if (newDesc !== oldDesc) {
+                            patch.description = newDesc === "" ? null : newDesc;
+                        }
+                    }
+                    if (completed !== task.completed) patch.completed = completed;
+
+                    if (Object.keys(patch).length === 0) {
+                        closeModal();
+                        return;
+                    }
+
+                    try {
+                        await api.tasks.patch(task.id, patch);
+                        toast("Task updated", "success");
+                        closeModal();
+                        await refreshTasks();
+                    } catch (err) {
+                        toast(err.message, "error");
+                    }
+                },
+            }, [
+                el("div", { class: "field" }, [
+                    el("label", {}, "Title"),
+                    titleInput,
+                ]),
+                el("div", { class: "field" }, [
+                    el("label", {}, "Description"),
+                    descInput,
+                    el("label", { class: "checkbox" }, [
+                        clearCheckbox,
+                        el("span", {}, "Clear description (set to NULL)"),
+                    ]),
+                ]),
+                el("div", { class: "field" }, [
+                    el("label", { class: "checkbox" }, [
+                        completedCheckbox,
+                        el("span", {}, "Completed"),
+                    ]),
+                ]),
+                el("div", { class: "modal-footer" }, [
+                    el("button", { type: "button", class: "btn", onclick: closeModal }, "Cancel"),
+                    el("button", { type: "submit", class: "btn btn-primary" }, "Save"),
+                ]),
+            ]),
+        ]);
+
+        setTimeout(() => titleInput.focus(), 50);
+    }
+
+    function confirmDeleteTask(task) {
+        openConfirm({
+            title: "Delete task?",
+            message: `“${task.title}” will be permanently removed.`,
+            confirmLabel: "Delete",
+            danger: true,
+            onConfirm: async () => {
+                try {
+                    await api.tasks.delete(task.id);
+                    toast("Task deleted", "success");
+                    await refreshTasks();
+                } catch (e) {
+                    toast(e.message, "error");
+                }
+            },
+        });
+    }
+
+    /* ==========================================================================
+   Users view
+   ========================================================================== */
+
+    function renderUsersView() {
+        const container = el("section", { class: "container" });
+
+        container.appendChild(
+            el("div", { class: "toolbar" }, [
+                el("h1", {}, "Users"),
+                el("div", { class: "actions" }, [
+                    el(
+                        "button",
+                        { class: "btn", onclick: () => refreshUsers() },
+                        "Refresh"
+                    ),
+                    el(
+                        "button",
+                        {
+                            class: "btn btn-primary",
+                            onclick: () => openCreateUserModal(),
+                        },
+                        "+ New user"
+                    ),
+                ]),
+            ])
+        );
+
+        if (state.error.users) {
+            container.appendChild(el("div", { class: "error-block" }, state.error.users));
+        }
+
+        if (state.loading.users && state.users.length === 0) {
+            container.appendChild(
+                el("div", { class: "loading-block" }, [el("div", { class: "spinner" }), "Loading…"])
+            );
+            return container;
+        }
+
+        if (state.users.length === 0) {
+            container.appendChild(
+                el("div", { class: "empty" }, [
+                    el("h3", {}, "No users yet"),
+                    el("p", {}, "Create the first user to start adding tasks."),
+                ])
+            );
+            return container;
+        }
+
+        const list = el("div", { class: "list" });
+        list.classList.add("user-grid");
+        state.users.forEach((u) => list.appendChild(renderUserItem(u)));
+        container.appendChild(list);
+
+        return container;
+    }
+
+    function renderUserItem(user) {
+        return el("article", { class: "user-item" }, [
+            el("div", { class: "user-card-top" }, [
+                el("div", { class: "user-avatar" }, userInitials(user.full_name)),
+                el("div", { class: "user-info" }, [
+                    el("p", { class: "user-name" }, user.full_name),
+                ]),
+            ]),
+            el("div", { class: "user-card-body" }, [
+                el(
+                    "div",
+                    { class: "user-phone" },
+                    user.phone_number ? user.phone_number : "— no phone —"
+                ),
+            ]),
+            el("div", { class: "user-actions" }, [
+                el(
+                    "button",
+                    {
+                        class: "btn btn-sm btn-user-edit",
+                        onclick: () => openEditUserModal(user),
+                    },
+                    "Edit"
+                ),
+                el(
+                    "button",
+                    {
+                        class: "btn btn-sm btn-user-delete",
+                        onclick: () => confirmDeleteUser(user),
+                    },
+                    "Delete"
+                ),
+            ]),
+        ]);
+    }
+
+    function openCreateUserModal() {
+        let nameVal = "";
+        let phoneVal = "";
+
+        const nameInput = el("input", {
+            class: "input",
+            type: "text",
+            maxLength: 100,
+            required: true,
+            oninput: (e) => (nameVal = e.target.value),
+        });
+        const phoneInput = el("input", {
+            class: "input",
+            type: "tel",
+            placeholder: "+71112223344",
+            oninput: (e) => (phoneVal = e.target.value),
+        });
+
+        openModal([
+            el("div", { class: "modal-header" }, [
+                el("h2", {}, "New user"),
+                el("button", { class: "btn btn-ghost btn-sm", onclick: closeModal, "aria-label": "Close" }, "✕"),
+            ]),
+            el("form", {
+                class: "modal-body",
+                onsubmit: async (e) => {
+                    e.preventDefault();
+                    if (!nameVal.trim()) {
+                        toast("Full name is required", "error");
+                        return;
+                    }
+                    try {
+                        const body = { full_name: nameVal.trim() };
+                        const phone = phoneVal.trim();
+                        if (phone) body.phone_number = phone;
+                        await api.users.create(body);
+                        toast("User created", "success");
+                        closeModal();
+                        await refreshUsers();
+                    } catch (err) {
+                        toast(err.message, "error");
+                    }
+                },
+            }, [
+                el("div", { class: "field" }, [
+                    el("label", {}, "Full name"),
+                    nameInput,
+                    el("span", { class: "help" }, "3–100 characters"),
+                ]),
+                el("div", { class: "field" }, [
+                    el("label", {}, "Phone number (optional)"),
+                    phoneInput,
+                    el("span", { class: "help" }, "Format: +<digits>, 10–15 chars"),
+                ]),
+                el("div", { class: "modal-footer" }, [
+                    el("button", { type: "button", class: "btn", onclick: closeModal }, "Cancel"),
+                    el("button", { type: "submit", class: "btn btn-primary" }, "Create"),
+                ]),
+            ]),
+        ]);
+
+        setTimeout(() => nameInput.focus(), 50);
+    }
+
+    function openEditUserModal(user) {
+        let nameVal = user.full_name;
+        let phoneVal = user.phone_number ?? "";
+        let phoneClear = false;
+
+        const nameInput = el("input", {
+            class: "input",
+            type: "text",
+            value: nameVal,
+            maxLength: 100,
+            required: true,
+            oninput: (e) => (nameVal = e.target.value),
+        });
+        const phoneInput = el("input", {
+            class: "input",
+            type: "tel",
+            value: phoneVal,
+            placeholder: "+71112223344",
+            oninput: (e) => {
+                phoneVal = e.target.value;
+                phoneClear = false;
+                clearCheckbox.checked = false;
+            },
+        });
+        const clearCheckbox = el("input", {
+            type: "checkbox",
+            onchange: (e) => {
+                phoneClear = e.target.checked;
+                if (phoneClear) {
+                    phoneInput.value = "";
+                    phoneInput.disabled = true;
+                } else {
+                    phoneInput.disabled = false;
+                }
+            },
+        });
+
+        openModal([
+            el("div", { class: "modal-header" }, [
+                el("h2", {}, "Edit user"),
+                el("button", { class: "btn btn-ghost btn-sm", onclick: closeModal, "aria-label": "Close" }, "✕"),
+            ]),
+            el("form", {
+                class: "modal-body",
+                onsubmit: async (e) => {
+                    e.preventDefault();
+                    const patch = {};
+                    const newName = nameVal.trim();
+                    if (!newName) {
+                        toast("Full name is required", "error");
+                        return;
+                    }
+                    if (newName !== user.full_name) patch.full_name = newName;
+                    if (phoneClear) {
+                        patch.phone_number = null;
+                    } else {
+                        const newPhone = phoneVal.trim();
+                        const oldPhone = user.phone_number ?? "";
+                        if (newPhone !== oldPhone) {
+                            patch.phone_number = newPhone === "" ? null : newPhone;
+                        }
+                    }
+
+                    if (Object.keys(patch).length === 0) {
+                        closeModal();
+                        return;
+                    }
+
+                    try {
+                        await api.users.patch(user.id, patch);
+                        toast("User updated", "success");
+                        closeModal();
+                        await refreshUsers();
+                    } catch (err) {
+                        toast(err.message, "error");
+                    }
+                },
+            }, [
+                el("div", { class: "field" }, [
+                    el("label", {}, "Full name"),
+                    nameInput,
+                ]),
+                el("div", { class: "field" }, [
+                    el("label", {}, "Phone number"),
+                    phoneInput,
+                    el("label", { class: "checkbox" }, [
+                        clearCheckbox,
+                        el("span", {}, "Clear phone number (set to NULL)"),
+                    ]),
+                ]),
+                el("div", { class: "modal-footer" }, [
+                    el("button", { type: "button", class: "btn", onclick: closeModal }, "Cancel"),
+                    el("button", { type: "submit", class: "btn btn-primary" }, "Save"),
+                ]),
+            ]),
+        ]);
+
+        setTimeout(() => nameInput.focus(), 50);
+    }
+
+    function confirmDeleteUser(user) {
+        openConfirm({
+            title: "Delete user?",
+            message: `“${user.full_name}” will be permanently removed. Their tasks may be affected.`,
+            confirmLabel: "Delete",
+            danger: true,
+            onConfirm: async () => {
+                try {
+                    await api.users.delete(user.id);
+                    toast("User deleted", "success");
+                    if (state.currentUserId === user.id) setCurrentUser(null);
+                    await refreshUsers();
+                    await refreshTasks();
+                } catch (e) {
+                    toast(e.message, "error");
+                }
+            },
+        });
+    }
+
+    /* ==========================================================================
+   Statistics view
+   ========================================================================== */
+
+    function renderStatisticsView() {
+        const container = el("section", { class: "container" });
+        const currentUser = userById(state.currentUserId);
+
+        container.appendChild(
+            el("div", { class: "toolbar" }, [el("h1", {}, "Statistics")])
+        );
+
+        const maxOffset = getStatsRangeMaxOffset();
+        const safeDenominator = maxOffset || 1;
+        const minPercent = (state.statsRange.minDay / safeDenominator) * 100;
+        const maxPercent = (state.statsRange.maxDay / safeDenominator) * 100;
+        const tickPercents = getStatsTickPercents();
+
+        const presetButton = (id, label) =>
+            el(
+                "button",
+                {
+                    type: "button",
+                    class: "stats-preset-btn",
+                    "aria-pressed": state.statsGranularity === id ? "true" : "false",
+                    onclick: () => setStatsGranularity(id),
+                },
+                label
+            );
+
+        container.appendChild(
+            el("section", { class: "stats-panel" }, [
+                el("div", { class: "stats-panel-head" }, [
+                    el("div", { class: "stats-user-chip" }, [
+                        el(
+                            "div",
+                            { class: "stats-user-avatar" },
+                            currentUser ? userInitials(currentUser.full_name) : "?"
+                        ),
+                        el("div", { class: "stats-user-copy" }, [
+                            el("div", { class: "stats-user-label" }, "Scope"),
+                            el(
+                                "div",
+                                { class: "stats-user-name" },
+                                currentUser ? currentUser.full_name : "All users"
+                            ),
+                        ]),
+                    ]),
+                    el(
+                        "div",
+                        { class: "stats-panel-note" },
+                        "Metrics update automatically after changing dates or switching the active user."
+                    ),
+                ]),
+                el("div", { class: "stats-filters" }, [
+                    el("div", { class: "stats-preset-toggle", role: "group", "aria-label": "Date presets" }, [
+                        el("span", { class: "stats-preset-label" }, "Division size"),
+                        el("div", { class: "stats-preset-buttons" }, [
+                            presetButton("week", "Week"),
+                            presetButton("month", "Month"),
+                            presetButton("year", "Year"),
+                        ]),
+                    ]),
+                    el("div", { class: "stats-range-graph", "aria-label": "Selected date range" }, [
+                        el("div", { class: "stats-range-boundary-top" }, [
+                            el("div", {
+                                class: `stats-boundary left ${state.statsDraggingHandle === "left" ? "is-active" : ""}`.trim(),
+                            }, [
+                                el("span", { class: "stats-boundary-label" }, "Left boundary"),
+                                el("strong", { class: "stats-boundary-value" }, formatDateLabel(state.statsForm.from)),
+                            ]),
+                            el("div", {
+                                class: `stats-boundary right ${state.statsDraggingHandle === "right" ? "is-active" : ""}`.trim(),
+                            }, [
+                                el("span", { class: "stats-boundary-label" }, "Right boundary"),
+                                el("strong", { class: "stats-boundary-value" }, formatDateLabel(state.statsForm.to)),
+                            ]),
+                        ]),
+                        el("div", {
+                            class: "stats-range-track",
+                            onpointerdown: handleStatsTrackPointerDown,
+                        }, [
+                            el("div", { class: "stats-range-base" }),
+                            el(
+                                "div",
+                                { class: "stats-range-ticks", "aria-hidden": "true" },
+                                tickPercents.map((percent) =>
+                                    el("span", {
+                                        class: "stats-range-tick",
+                                        style: `left:${percent}%`,
+                                    })
+                                )
+                            ),
+                            el("div", {
+                                class: "stats-range-active",
+                                style: `left:${minPercent}%; right:${100 - maxPercent}%`,
+                            }),
+                            el("button", {
+                                type: "button",
+                                class: "stats-range-handle left",
+                                style: `left:${minPercent}%`,
+                                "aria-label": "Left date boundary",
+                                onpointerdown: (e) => beginStatsHandleDrag("left", e),
+                            }),
+                            el("button", {
+                                type: "button",
+                                class: "stats-range-handle right",
+                                style: `left:${maxPercent}%`,
+                                "aria-label": "Right date boundary",
+                                onpointerdown: (e) => beginStatsHandleDrag("right", e),
+                            }),
+                            state.statsDraggingHandle === "left"
+                                ? el(
+                                    "div",
+                                    {
+                                        class: "stats-range-tooltip left",
+                                        style: `left:${minPercent}%`,
+                                    },
+                                    formatDateLabel(state.statsForm.from)
+                                )
+                                : null,
+                            state.statsDraggingHandle === "right"
+                                ? el(
+                                    "div",
+                                    {
+                                        class: "stats-range-tooltip right",
+                                        style: `left:${maxPercent}%`,
+                                    },
+                                    formatDateLabel(state.statsForm.to)
+                                )
+                                : null,
+                        ]),
+                    ]),
+                ]),
+            ])
+        );
+
+        if (state.error.statistics) {
+            container.appendChild(
+                el("div", { class: "error-block" }, state.error.statistics)
+            );
+        }
+
+        if (state.loading.statistics) {
+            container.appendChild(
+                el("div", { class: "loading-block" }, [
+                    el("div", { class: "spinner" }),
+                    "Calculating…",
+                ])
+            );
+        } else if (state.statistics) {
+            container.appendChild(renderStatisticsCards(state.statistics));
+        } else {
+            container.appendChild(
+                el("div", { class: "empty stats-empty" }, [
+                    el("h3", {}, "Waiting for metrics"),
+                    el(
+                        "p",
+                        {},
+                        "Adjust the dates if needed. Statistics refresh automatically for the selected user."
+                    ),
+                ])
+            );
+        }
+
+        return container;
+    }
+
+    function renderStatisticsCards(stats) {
+        const cards = [
+            {
+                label: "Tasks created",
+                value: stats.tasks_created ?? 0,
+                icon: "calendar",
+            },
+            {
+                label: "Tasks completed",
+                value: stats.tasks_completed ?? 0,
+                icon: "check",
+            },
+            {
+                label: "Completion rate",
+                value: `${(stats.tasks_completed_rate ?? 0).toFixed(1)}`,
+                suffix: "%",
+                icon: "user",
+            },
+            {
+                label: "Avg. completion time",
+                value: formatDurationHuman(stats.tasks_average_completion_time),
+                icon: "pencil",
+            },
+        ];
+
+        return el(
+            "div",
+            { class: "stat-grid" },
+            cards.map((c) =>
+                el("div", { class: "stat-card" }, [
+                    el("div", { class: "stat-card-head" }, [
+                        el("div", { class: "stat-icon-wrap" }, [
+                            svgIcon(c.icon, "stat-icon"),
+                        ]),
+                        el("div", { class: "stat-label" }, c.label),
+                    ]),
+                    el("div", { class: "stat-value" }, [
+                        String(c.value),
+                        c.suffix ? el("span", { class: "stat-suffix" }, c.suffix) : null,
+                    ]),
+                ])
+            )
+        );
+    }
+
+    /* ==========================================================================
+   Generic confirm dialog
+   ========================================================================== */
+
+    function openConfirm({ title, message, confirmLabel = "OK", danger = false, onConfirm }) {
+        openModal([
+            el("div", { class: "modal-header" }, [
+                el("h2", {}, title),
+                el("button", { class: "btn btn-ghost btn-sm", onclick: closeModal, "aria-label": "Close" }, "✕"),
+            ]),
+            el("div", { class: "modal-body" }, [el("p", {}, message)]),
+            el("div", { class: "modal-footer" }, [
+                el("button", { class: "btn", onclick: closeModal }, "Cancel"),
+                el(
+                    "button",
+                    {
+                        class: danger ? "btn btn-danger" : "btn btn-primary",
+                        onclick: async () => {
+                            closeModal();
+                            await onConfirm();
+                        },
+                    },
+                    confirmLabel
+                ),
+            ]),
+        ]);
+    }
+
+    /* ==========================================================================
+   Top-level render
+   ========================================================================== */
+
+    function render() {
+        const shell = ensureAppShell();
+        const headerKey = getHeaderKey();
+        const tabsKey = getTabsKey();
+
+        if (headerKey !== lastHeaderKey) {
+            lastHeaderKey = headerKey;
+            clear(shell.headerHost);
+            shell.headerHost.appendChild(renderHeader());
+        }
+
+        if (tabsKey !== lastTabsKey) {
+            lastTabsKey = tabsKey;
+            clear(shell.tabsHost);
+            shell.tabsHost.appendChild(renderTabs());
+        }
+
+        let view;
+        switch (state.view) {
+            case "users":
+                view = renderUsersView();
+                break;
+            case "statistics":
+                view = renderStatisticsView();
+                break;
+            case "tasks":
+            default:
+                view = renderTasksView();
+                break;
+        }
+
+        clear(shell.main);
+        shell.main.appendChild(view);
+    }
+
+    /* ==========================================================================
+   Bootstrap
+   ========================================================================== */
+
+    async function init() {
+        applyTheme(state.theme);
+        initSystemThemeSync();
+        loadCurrentUser();
+        initRouter();
+
+        subscribe(render);
+        render();
+
+        await refreshUsers();
+        await refreshTasks();
+
+        if (state.view === "statistics") {
+            if (!state.statsForm.from && !state.statsForm.to) {
+                setStatsGranularity(state.statsGranularity);
+            } else {
+                syncStatsRangeFromForm();
+            }
+            scheduleStatisticsRefresh();
+        }
+
+        let lastView = state.view;
+        subscribe(() => {
+            if (state.view !== lastView) {
+                lastView = state.view;
+                if (state.view === "users") scheduleViewRefresh(refreshUsers);
+                if (state.view === "tasks") scheduleViewRefresh(refreshTasks);
+                if (state.view === "statistics") scheduleViewRefresh(refreshStatistics);
+            }
+        });
+
+        let lastStatisticsKey = JSON.stringify({
+            view: state.view,
+            currentUserId: state.currentUserId,
+            from: state.statsForm.from,
+            to: state.statsForm.to,
+        });
+        subscribe(() => {
+            const nextStatisticsKey = JSON.stringify({
+                view: state.view,
+                currentUserId: state.currentUserId,
+                from: state.statsForm.from,
+                to: state.statsForm.to,
+            });
+
+            if (nextStatisticsKey === lastStatisticsKey) {
+                return;
+            }
+
+            const previousKey = JSON.parse(lastStatisticsKey);
+            lastStatisticsKey = nextStatisticsKey;
+
+            if (
+                state.view === "statistics" &&
+                (
+                    previousKey.currentUserId !== state.currentUserId ||
+                    previousKey.from !== state.statsForm.from ||
+                    previousKey.to !== state.statsForm.to
+                )
+            ) {
+                scheduleStatisticsRefresh();
+            }
+        });
+
+        finishBoot();
+    }
+
+    init().catch((e) => {
+        finishBoot();
+        console.error(e);
+        toast(`Init error: ${e.message}`, "error");
+    });
+
+</script>
+</body>
+</html>
